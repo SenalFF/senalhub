@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Senalhub - YouTube Downloader</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -46,6 +47,29 @@
             min-height: 100vh;
             display: flex;
             flex-direction: column;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        #particles-js {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: -1;
+            opacity: 0.5;
+        }
+
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        [data-theme="dark"] .glass-effect {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .side-menu {
@@ -186,11 +210,13 @@
             text-align: center;
             margin-bottom: 50px;
             padding: 80px 20px;
-            background: linear-gradient(135deg, var(--bg-secondary), var(--bg-card));
+            background: linear-gradient(135deg, rgba(255,59,92,0.1), rgba(255,107,133,0.1));
+            backdrop-filter: blur(20px);
             border-radius: 30px;
             position: relative;
             overflow: hidden;
-            box-shadow: 0 20px 60px var(--shadow);
+            box-shadow: 0 20px 60px var(--shadow), 0 0 100px rgba(255,59,92,0.2);
+            border: 1px solid rgba(255,59,92,0.3);
         }
 
         .hero::before {
@@ -1142,6 +1168,7 @@
     </style>
 </head>
 <body>
+    <div id="particles-js"></div>
     <div class="side-menu" id="sideMenu">
         <div class="menu-header">
             <h2>Senalhub</h2>
@@ -1157,7 +1184,7 @@
     <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
 
     <audio id="welcomeAudio" autoplay>
-        <source src="attached_assets/webc.mp3" type="audio/mpeg">
+        <source src="webc.mp3" type="audio/mpeg">
     </audio>
     
     <button class="audio-stop-btn" id="audioStopBtn" onclick="toggleAudio()">
@@ -1180,9 +1207,9 @@
 
     <main>
         <div id="homePage">
-            <div class="hero">
-                <h1>Download Videos & Audio</h1>
-                <p>Fast, easy, and free YouTube downloader</p>
+            <div class="hero" data-aos="fade-up">
+                <h1><span id="typed-text"></span></h1>
+                <p data-aos="fade-up" data-aos-delay="200">Fast, easy, and free YouTube downloader</p>
             </div>
             <div class="search-container">
                 <div class="search-box">
@@ -1199,25 +1226,25 @@
                 </div>
             </div>
 
-            <div class="how-to-use">
+            <div class="how-to-use" data-aos="fade-up" data-aos-delay="300">
                 <h2>📖 How to Use My Website</h2>
                 <div class="how-to-steps">
-                    <div class="step-card">
+                    <div class="step-card" data-aos="zoom-in" data-aos-delay="400">
                         <div class="step-number">1</div>
                         <h3>Search or Paste</h3>
                         <p>Enter a YouTube video title or paste the video URL in the search box</p>
                     </div>
-                    <div class="step-card">
+                    <div class="step-card" data-aos="zoom-in" data-aos-delay="500">
                         <div class="step-number">2</div>
                         <h3>Select Video</h3>
                         <p>Browse the search results and click on the video you want to download</p>
                     </div>
-                    <div class="step-card">
+                    <div class="step-card" data-aos="zoom-in" data-aos-delay="600">
                         <div class="step-number">3</div>
                         <h3>Choose Quality</h3>
                         <p>Select your preferred video quality or audio format (MP3)</p>
                     </div>
-                    <div class="step-card">
+                    <div class="step-card" data-aos="zoom-in" data-aos-delay="700">
                         <div class="step-number">4</div>
                         <h3>Download</h3>
                         <p>Click the download button and your file will be saved with a clean filename</p>
@@ -1225,20 +1252,20 @@
                 </div>
             </div>
 
-            <div class="coming-soon-section" style="margin-top: 60px;">
+            <div class="coming-soon-section" style="margin-top: 60px;" data-aos="fade-up" data-aos-delay="800">
                 <h2 class="coming-soon-title">🚀 Coming Soon</h2>
                 <div class="coming-soon-grid">
-                    <div class="coming-soon-card">
+                    <div class="coming-soon-card" data-aos="flip-left" data-aos-delay="900">
                         <i class="fab fa-facebook"></i>
                         <h4>Facebook Downloader</h4>
                         <p>Download Facebook videos easily</p>
                     </div>
-                    <div class="coming-soon-card">
+                    <div class="coming-soon-card" data-aos="flip-left" data-aos-delay="1000">
                         <i class="fab fa-tiktok"></i>
                         <h4>TikTok Downloader</h4>
                         <p>Save TikTok videos without watermark</p>
                     </div>
-                    <div class="coming-soon-card">
+                    <div class="coming-soon-card" data-aos="flip-left" data-aos-delay="1100">
                         <i class="fab fa-instagram"></i>
                         <h4>Instagram Downloader</h4>
                         <p>Download Instagram photos & videos</p>
@@ -1261,10 +1288,10 @@
         </div>
 
         <div id="aboutPage" class="hidden">
-            <div class="about-container">
-                <img src="attached_assets/d.jpg" alt="Mr. Senal" class="developer-image">
-                <h1 style="margin-bottom: 20px;">About the Developer</h1>
-                <div class="about-text">
+            <div class="about-container" data-aos="fade-up">
+                <img src="d.jpg" alt="Mr. Senal" class="developer-image" data-aos="zoom-in" data-aos-delay="200">
+                <h1 style="margin-bottom: 20px;" data-aos="fade-up" data-aos-delay="300">About the Developer</h1>
+                <div class="about-text" data-aos="fade-up" data-aos-delay="400">
                     Hi, I'm Mr. Senal, a passionate web developer based in Sri Lanka. I love coding, designing, and building powerful web applications that make technology simple and enjoyable for everyone. What started as a hobby quickly grew into a strong passion for web development, where I focus on creating clean, fast, and user-friendly digital experiences. I'm always excited to learn new technologies, solve real-world problems, and bring creative ideas to life through code. My goal is to keep improving, build amazing projects, and help make the web a better place.
                 </div>
                 <div class="skills-icons">
@@ -1636,6 +1663,110 @@
             const audio = document.getElementById('welcomeAudio');
             audio.volume = 0.5;
             audio.play().catch(e => console.log('Auto-play prevented:', e));
+        });
+    </script>
+
+    <!-- Particles.js from jsDelivr -->
+    <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+    
+    <!-- Typed.js from jsDelivr -->
+    <script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.16/dist/typed.umd.js"></script>
+    
+    <!-- AOS from jsDelivr -->
+    <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+
+    <script>
+        // Initialize AOS
+        AOS.init({
+            duration: 1000,
+            once: true,
+            offset: 100
+        });
+
+        // Initialize Typed.js
+        const typed = new Typed('#typed-text', {
+            strings: ['Download Videos & Audio', 'YouTube Downloader', 'Fast & Free Downloads'],
+            typeSpeed: 60,
+            backSpeed: 40,
+            loop: true,
+            backDelay: 2000
+        });
+
+        // Initialize Particles.js
+        particlesJS('particles-js', {
+            particles: {
+                number: {
+                    value: 80,
+                    density: {
+                        enable: true,
+                        value_area: 800
+                    }
+                },
+                color: {
+                    value: '#ff3b5c'
+                },
+                shape: {
+                    type: 'circle',
+                    stroke: {
+                        width: 0,
+                        color: '#000000'
+                    }
+                },
+                opacity: {
+                    value: 0.5,
+                    random: false,
+                    anim: {
+                        enable: false
+                    }
+                },
+                size: {
+                    value: 3,
+                    random: true,
+                    anim: {
+                        enable: false
+                    }
+                },
+                line_linked: {
+                    enable: true,
+                    distance: 150,
+                    color: '#ff3b5c',
+                    opacity: 0.4,
+                    width: 1
+                },
+                move: {
+                    enable: true,
+                    speed: 2,
+                    direction: 'none',
+                    random: false,
+                    straight: false,
+                    out_mode: 'out',
+                    bounce: false
+                }
+            },
+            interactivity: {
+                detect_on: 'canvas',
+                events: {
+                    onhover: {
+                        enable: true,
+                        mode: 'repulse'
+                    },
+                    onclick: {
+                        enable: true,
+                        mode: 'push'
+                    },
+                    resize: true
+                },
+                modes: {
+                    repulse: {
+                        distance: 100,
+                        duration: 0.4
+                    },
+                    push: {
+                        particles_nb: 4
+                    }
+                }
+            },
+            retina_detect: true
         });
     </script>
 </body>
