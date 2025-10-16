@@ -1188,9 +1188,186 @@
             0% { opacity: 0.3; transform: translateX(-50%) scale(0.8); }
             100% { opacity: 0.6; transform: translateX(-50%) scale(1.2); }
         }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+        }
+
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #ff3b5c 0%, #ff6b85 50%, #ffa07a 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 99999;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+
+        .loading-screen.hide {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .loader-content {
+            text-align: center;
+            animation: fadeInUp 0.8s ease;
+        }
+
+        .loader-logo {
+            font-size: 72px;
+            font-weight: 900;
+            color: white;
+            margin-bottom: 30px;
+            animation: logoFloat 2s ease-in-out infinite;
+            text-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .loader-spinner {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 30px;
+            position: relative;
+        }
+
+        .spinner-ring {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            border: 4px solid transparent;
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        .spinner-ring:nth-child(2) {
+            width: 60px;
+            height: 60px;
+            top: 10px;
+            left: 10px;
+            border-top-color: rgba(255, 255, 255, 0.6);
+            animation-duration: 1.5s;
+            animation-direction: reverse;
+        }
+
+        .spinner-ring:nth-child(3) {
+            width: 40px;
+            height: 40px;
+            top: 20px;
+            left: 20px;
+            border-top-color: rgba(255, 255, 255, 0.3);
+            animation-duration: 2s;
+        }
+
+        .loader-text {
+            font-size: 24px;
+            font-weight: 600;
+            color: white;
+            margin-bottom: 15px;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        .loader-subtext {
+            font-size: 16px;
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 500;
+        }
+
+        .loading-dots {
+            display: inline-flex;
+            gap: 5px;
+        }
+
+        .loading-dots span {
+            width: 8px;
+            height: 8px;
+            background: white;
+            border-radius: 50%;
+            animation: dotBounce 1.4s ease-in-out infinite;
+        }
+
+        .loading-dots span:nth-child(1) {
+            animation-delay: 0s;
+        }
+
+        .loading-dots span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .loading-dots span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes logoFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes dotBounce {
+            0%, 80%, 100% { transform: scale(0.6); opacity: 0.5; }
+            40% { transform: scale(1); opacity: 1; }
+        }
     </style>
 </head>
 <body>
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loader-content">
+            <div class="loader-logo">Senalhub</div>
+            <div class="loader-spinner">
+                <div class="spinner-ring"></div>
+                <div class="spinner-ring"></div>
+                <div class="spinner-ring"></div>
+            </div>
+            <div class="loader-text">Loading Your Experience</div>
+            <div class="loader-subtext">
+                Please wait
+                <div class="loading-dots">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div id="particles-js"></div>
     <div class="side-menu" id="sideMenu">
         <div class="menu-header">
@@ -1425,12 +1602,35 @@
             }
         }
 
+        function normalizeYouTubeUrl(input) {
+            const patterns = [
+                /(?:https?:\/\/)?(?:www\.)?youtube\.com\/watch\?v=([a-zA-Z0-9_-]{11})/,
+                /(?:https?:\/\/)?(?:www\.)?youtube\.com\/shorts\/([a-zA-Z0-9_-]{11})/,
+                /(?:https?:\/\/)?(?:www\.)?youtube\.com\/embed\/([a-zA-Z0-9_-]{11})/,
+                /(?:https?:\/\/)?(?:www\.)?youtube\.com\/v\/([a-zA-Z0-9_-]{11})/,
+                /(?:https?:\/\/)?youtu\.be\/([a-zA-Z0-9_-]{11})/,
+                /(?:https?:\/\/)?(?:m\.)?youtube\.com\/watch\?v=([a-zA-Z0-9_-]{11})/,
+                /(?:https?:\/\/)?(?:music\.)?youtube\.com\/watch\?v=([a-zA-Z0-9_-]{11})/
+            ];
+            
+            for (const pattern of patterns) {
+                const match = input.match(pattern);
+                if (match && match[1]) {
+                    return match[1];
+                }
+            }
+            
+            return input;
+        }
+
         async function performSearch() {
-            const query = document.getElementById('searchInput').value.trim();
-            if (!query) {
-                alert('Please enter a search term or URL');
+            const input = document.getElementById('searchInput').value.trim();
+            if (!input) {
+                showNotification('Please enter a search term or URL', 'warning');
                 return;
             }
+
+            const query = normalizeYouTubeUrl(input);
 
             document.getElementById('homePage').classList.add('hidden');
             document.getElementById('resultsPage').classList.remove('hidden');
@@ -1439,22 +1639,78 @@
 
             try {
                 const response = await fetch(`${API_BASE}/search?q=${encodeURIComponent(query)}`);
+                
+                if (!response.ok) {
+                    throw new Error(`API returned ${response.status}: ${response.statusText}`);
+                }
+                
                 const data = await response.json();
                 
                 document.getElementById('loadingSpinner').classList.add('hidden');
 
                 if (data.results && data.results.length > 0) {
                     displayResults(data.results);
+                    showNotification(`Found ${data.results.length} results`, 'success');
                 } else if (data.data && data.data.length > 0) {
                     displayResults(data.data);
+                    showNotification(`Found ${data.data.length} results`, 'success');
                 } else {
                     document.getElementById('resultsGrid').innerHTML = '<p style="text-align: center; color: var(--text-secondary);">No results found. Try a different search term.</p>';
+                    showNotification('No results found', 'info');
                 }
             } catch (error) {
                 console.error('Search error:', error);
                 document.getElementById('loadingSpinner').classList.add('hidden');
-                document.getElementById('resultsGrid').innerHTML = '<p style="text-align: center; color: var(--accent);">Error searching. Please try again.</p>';
+                document.getElementById('resultsGrid').innerHTML = `
+                    <div style="text-align: center; padding: 40px;">
+                        <i class="fas fa-exclamation-triangle" style="font-size: 48px; color: var(--accent); margin-bottom: 20px;"></i>
+                        <p style="color: var(--text-primary); font-size: 18px; margin-bottom: 10px;">Error searching videos</p>
+                        <p style="color: var(--text-secondary);">Please check your connection and try again</p>
+                        <button class="search-btn" style="margin-top: 20px;" onclick="showPage('home')">
+                            <i class="fas fa-arrow-left"></i> Go Back
+                        </button>
+                    </div>
+                `;
+                showNotification('Search failed. Please try again', 'error');
             }
+        }
+
+        function showNotification(message, type = 'info') {
+            const colors = {
+                success: 'linear-gradient(135deg, #28a745, #20c997)',
+                error: 'linear-gradient(135deg, #dc3545, #c82333)',
+                warning: 'linear-gradient(135deg, #ffc107, #ff9800)',
+                info: 'linear-gradient(135deg, #17a2b8, #138496)'
+            };
+            
+            const icons = {
+                success: 'fa-check-circle',
+                error: 'fa-exclamation-circle',
+                warning: 'fa-exclamation-triangle',
+                info: 'fa-info-circle'
+            };
+
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: ${colors[type] || colors.info};
+                color: white;
+                padding: 15px 25px;
+                border-radius: 10px;
+                font-weight: 600;
+                z-index: 10001;
+                box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+                animation: slideIn 0.3s ease;
+            `;
+            notification.innerHTML = `<i class="fas ${icons[type] || icons.info}"></i> ${message}`;
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => document.body.removeChild(notification), 300);
+            }, 3000);
         }
 
         function displayResults(results) {
@@ -1604,23 +1860,7 @@
         }
 
         async function downloadVideo(videoId, format, title) {
-            const downloadingMsg = document.createElement('div');
-            downloadingMsg.style.cssText = `
-                position: fixed;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-                background: linear-gradient(135deg, var(--accent), var(--accent-hover));
-                color: white;
-                padding: 30px 50px;
-                border-radius: 15px;
-                font-size: 20px;
-                font-weight: bold;
-                z-index: 10000;
-                box-shadow: 0 10px 40px rgba(0,0,0,0.3);
-            `;
-            downloadingMsg.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Preparing Download...';
-            document.body.appendChild(downloadingMsg);
+            showNotification('Preparing download...', 'info');
             
             try {
                 const apiUrl = `${API_BASE}/download?id=${videoId}&format=${format}`;
@@ -1636,33 +1876,32 @@
                 const filename = `${cleanTitle}_senalhub.${extension}`;
                 
                 const response = await fetch(apiUrl);
+                
+                if (!response.ok) {
+                    throw new Error(`Download API returned ${response.status}`);
+                }
+                
                 const data = await response.json();
                 
                 if (data.downloadUrl) {
-                    const proxyUrl = `/proxy-download?url=${encodeURIComponent(data.downloadUrl)}&filename=${encodeURIComponent(filename)}`;
-                    
                     const a = document.createElement('a');
-                    a.href = proxyUrl;
+                    a.href = data.downloadUrl;
                     a.download = filename;
+                    a.target = '_blank';
+                    a.rel = 'noopener noreferrer';
                     document.body.appendChild(a);
                     a.click();
                     document.body.removeChild(a);
                     
-                    downloadingMsg.innerHTML = '<i class="fas fa-check-circle"></i> Download Started!<br><small style="font-size: 14px; opacity: 0.9;">' + filename + '</small>';
-                    downloadingMsg.style.background = 'linear-gradient(135deg, #28a745, #20c997)';
-                    setTimeout(() => {
-                        document.body.removeChild(downloadingMsg);
-                    }, 3000);
+                    showNotification(`Download started: ${filename}`, 'success');
+                } else if (data.error) {
+                    throw new Error(data.error);
                 } else {
-                    throw new Error('Download URL not found in response');
+                    throw new Error('Download URL not available');
                 }
             } catch (error) {
                 console.error('Download error:', error);
-                downloadingMsg.innerHTML = '<i class="fas fa-exclamation-circle"></i> Download Failed!<br><small style="font-size: 14px;">Please try again</small>';
-                downloadingMsg.style.background = 'linear-gradient(135deg, #dc3545, #c82333)';
-                setTimeout(() => {
-                    document.body.removeChild(downloadingMsg);
-                }, 3000);
+                showNotification(`Download failed: ${error.message}`, 'error');
             }
         }
 
@@ -1686,6 +1925,17 @@
             const audio = document.getElementById('welcomeAudio');
             audio.volume = 0.5;
             audio.play().catch(e => console.log('Auto-play prevented:', e));
+            
+            // Hide loading screen with smooth transition
+            setTimeout(() => {
+                const loadingScreen = document.getElementById('loadingScreen');
+                loadingScreen.classList.add('hide');
+                
+                // Remove loading screen from DOM after transition
+                setTimeout(() => {
+                    loadingScreen.remove();
+                }, 500);
+            }, 2000);
         });
     </script>
 
